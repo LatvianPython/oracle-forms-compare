@@ -26,14 +26,14 @@ def main(argv):
 
     # clean up previous run, if any
     for output_file in output_files:
-        subprocess.run(['del', forms_path + output_file])
+        subprocess.run(['cmd', '/c', 'del', forms_path + output_file])
 
     # create object list reports for both revisions
-    subprocess.run(['cd', forms_path])
+    subprocess.run(['cmd', '/c', 'cd', forms_path])
     for i in [0, 1]:
         subprocess.run(svn_command.copy() + [revisions[i]])
         subprocess.run(object_list_command)
-        subprocess.run(['rename', form_location + '.txt', output_files[i]])
+        subprocess.run(['cmd', '/c', 'rename', form_location + '.txt', output_files[i]])
 
     # todo: check what the revision was, and update towards that instead
     # auto update to original revision, assuming it's revision we are checking to
@@ -44,5 +44,4 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    # todo: test if script works after switch to subprocess
     main(sys.argv)
