@@ -33,13 +33,13 @@ def main():
     subprocess.run(['cmd', '/c', 'cd', forms_path])
     for file_name, revision_number in zip(output_files, revisions):
         subprocess.run(['cmd', '/c', 'del', forms_path + file_name])
-        subprocess.run(svn_command + [revision_number])
+        subprocess.run(svn_command + [str(revision_number)])
         subprocess.run(object_list_command)
         subprocess.run(['cmd', '/c', 'rename', form_location + '.txt', file_name])
 
     # todo: check what the revision was, and update towards that instead
     # auto update to original revision, assuming it's revision we are checking to
-    subprocess.run(svn_command + [revisions[-1]])
+    subprocess.run(svn_command + [str(revisions[-1])])
 
     # launch winMerge with both of the created files as parameters
     subprocess.run(['WinMergeU', forms_path + 'from.txt', forms_path + 'to.txt'])
