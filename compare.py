@@ -10,17 +10,17 @@ def main():
     parser.add_argument('form_name', type=str,
                         help='Name of the form, whose revisions will be compared against each other.' +
                              'form should be given without the .fmb extension')
-    parser.add_argument('revision_from', type=int, help='base revision')
-    parser.add_argument('revision_to', type=int, help='revision that first one will be compared against')
+    parser.add_argument('revision_from', type=str, help='base revision', nargs='?')
+    parser.add_argument('revision_to', type=str, help='revision that first one will be compared against', nargs='?')
+    parser.set_defaults(revision_from='PREV', revision_to='HEAD')
     args = parser.parse_args()
-    # see example.ini
 
+    # see example.ini
     config = configparser.ConfigParser()
     config.read('config.ini')
 
     forms_path = config['app']['forms_path']
 
-    # todo: consider renaming of variables
     form_name = args.form_name.upper()
     form_location = forms_path + form_name
     svn_command = ['svn', 'update', form_location + '.FMB', '-r']
@@ -31,15 +31,15 @@ def main():
     revisions = [args.revision_from, args.revision_to]
 
     subprocess.run(['cmd', '/c', 'cd', forms_path])
-    for file_name, revision_number in zip(output_files, revisions):
+    for file_name, revision in zip(output_files, revisions):
         subprocess.run(['cmd', '/c', 'del', forms_path + file_name])
-        subprocess.run(svn_command + [str(revision_number)])
+        subprocess.run(svn_command + [revision])
         subprocess.run(object_list_command)
         subprocess.run(['cmd', '/c', 'rename', form_location + '.txt', file_name])
 
     # todo: check what the revision was, and update towards that instead
     # auto update to original revision, assuming it's revision we are checking to
-    subprocess.run(svn_command + [str(revisions[-1])])
+    subprocess.run(svn_command + [revisions[-1]])
 
     # launch winMerge with both of the created files as parameters
     subprocess.run(['WinMergeU', forms_path + 'from.txt', forms_path + 'to.txt'])
